@@ -14,9 +14,27 @@ export default async function DashboardPage() {
         <p className="text-sm text-ink-muted">Your business, at a glance.</p>
       </div>
 
-      <StatCard label="Today" revenue={stats.today.revenue} expenses={stats.today.expenses} net={stats.today.net} />
-      <StatCard label="This Week" revenue={stats.week.revenue} expenses={stats.week.expenses} net={stats.week.net} />
-      <StatCard label="This Month" revenue={stats.month.revenue} expenses={stats.month.expenses} net={stats.month.net} />
+      <StatCard
+        label="Today"
+        revenue={stats.today.revenue}
+        expenses={stats.today.expenses}
+        net={stats.today.net}
+        href="/dashboard/today"
+      />
+      <StatCard
+        label="This Week"
+        revenue={stats.week.revenue}
+        expenses={stats.week.expenses}
+        net={stats.week.net}
+        href="/dashboard/week"
+      />
+      <StatCard
+        label="This Month"
+        revenue={stats.month.revenue}
+        expenses={stats.month.expenses}
+        net={stats.month.net}
+        href="/dashboard/month"
+      />
 
       <div className="grid grid-cols-2 gap-3">
         <MiniStat label="Services this month" value={String(stats.month.serviceCount)} />

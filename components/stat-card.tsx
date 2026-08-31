@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { formatCurrency } from "@/lib/format"
 
 export function StatCard({
@@ -5,14 +6,16 @@ export function StatCard({
   revenue,
   expenses,
   net,
+  href,
 }: {
   label: string
   revenue: number
   expenses: number
   net: number
+  href?: string
 }) {
-  return (
-    <div className="rounded-2xl bg-surface p-5 shadow-card">
+  const content = (
+    <>
       <p className="text-sm font-medium text-ink-muted">{label}</p>
       <p className="mt-1 text-3xl font-bold tracking-tight text-ink">{formatCurrency(net)}</p>
       <p className="mt-0.5 text-xs text-ink-muted">net</p>
@@ -26,8 +29,21 @@ export function StatCard({
           <span className="font-semibold text-danger">{formatCurrency(expenses)}</span>
         </div>
       </div>
-    </div>
+    </>
   )
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className="block rounded-2xl bg-surface p-5 shadow-card transition active:scale-[0.99] active:bg-brand-light/40"
+      >
+        {content}
+      </Link>
+    )
+  }
+
+  return <div className="rounded-2xl bg-surface p-5 shadow-card">{content}</div>
 }
 
 export function MiniStat({ label, value }: { label: string; value: string }) {
