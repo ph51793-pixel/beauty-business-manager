@@ -6,12 +6,14 @@ export function StatCard({
   revenue,
   expenses,
   net,
+  transactionCount,
   href,
 }: {
   label: string
   revenue: number
   expenses: number
   net: number
+  transactionCount?: number
   href?: string
 }) {
   const content = (
@@ -28,6 +30,12 @@ export function StatCard({
           <span className="block text-ink-muted">Expenses</span>
           <span className="font-semibold text-danger">{formatCurrency(expenses)}</span>
         </div>
+        {transactionCount !== undefined && (
+          <div>
+            <span className="block text-ink-muted">Transactions</span>
+            <span className="font-semibold text-ink">{transactionCount}</span>
+          </div>
+        )}
       </div>
     </>
   )

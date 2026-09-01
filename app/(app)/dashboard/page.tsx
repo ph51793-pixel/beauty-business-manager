@@ -1,11 +1,22 @@
-import { getDashboardStats } from "@/lib/data/dashboard"
-import { StatCard, MiniStat } from "@/components/stat-card"
-import { formatCurrency } from "@/lib/format"
+import { getDashboardOverview } from "@/lib/data/finance"
+import { StatCard } from "@/components/stat-card"
+import { LocalTodayRedirect } from "@/components/local-today-redirect"
 
 export const dynamic = "force-dynamic"
 
-export default async function DashboardPage() {
-  const stats = await getDashboardStats()
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { today?: string }
+}) {
+  if (!searchParams.today || !ISO_DATE_PATTERN.test(searchParams.today)) {
+    return <LocalTodayRedirect basePath="/dashboard" />
+  }
+
+  const clientToday = searchParams.today
+  const stats = await getDashboardOverview(clientToday)
 
   return (
     <div className="flex flex-col gap-4">
@@ -19,27 +30,25 @@ export default async function DashboardPage() {
         revenue={stats.today.revenue}
         expenses={stats.today.expenses}
         net={stats.today.net}
-        href="/dashboard/today"
+        transactionCount={stats.today.transactionCount}
+        href={`/dashboard/today?today=${clientToday}`}
       />
       <StatCard
         label="This Week"
         revenue={stats.week.revenue}
         expenses={stats.week.expenses}
         net={stats.week.net}
-        href="/dashboard/week"
+        transactionCount={stats.week.transactionCount}
+        href={`/dashboard/week?today=${clientToday}`}
       />
       <StatCard
         label="This Month"
         revenue={stats.month.revenue}
         expenses={stats.month.expenses}
         net={stats.month.net}
-        href="/dashboard/month"
+        transactionCount={stats.month.transactionCount}
+        href={`/dashboard/month?today=${clientToday}`}
       />
-
-      <div className="grid grid-cols-2 gap-3">
-        <MiniStat label="Services this month" value={String(stats.month.serviceCount)} />
-        <MiniStat label="Average service value" value={formatCurrency(stats.month.averageServiceValue)} />
-      </div>
     </div>
   )
 }
