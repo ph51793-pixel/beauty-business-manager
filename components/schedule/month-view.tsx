@@ -51,6 +51,7 @@ export function MonthView({
           const isCurrentMonth = day.getMonth() === currentMonth
           const isToday = iso === today
           const dayAppointments = (byDay.get(iso) ?? []).filter((a) => a.status !== "cancelled")
+          const hasAppointments = dayAppointments.length > 0
           const visible = dayAppointments.slice(0, 3)
           const extra = dayAppointments.length - visible.length
 
@@ -59,24 +60,34 @@ export function MonthView({
               key={iso}
               type="button"
               onClick={() => onOpenDay(iso)}
-              className={`flex min-h-[104px] flex-col items-stretch gap-1 border-b border-r border-line p-2 text-left last:border-r-0 active:bg-brand-light/40 sm:min-h-[120px] ${
-                isCurrentMonth ? "bg-surface" : "bg-paper text-ink-muted"
+              className={`flex min-h-[104px] flex-col items-stretch gap-1 border-b border-r border-line p-2 text-left last:border-r-0 active:opacity-90 sm:min-h-[120px] ${
+                hasAppointments
+                  ? "rounded-lg bg-brand"
+                  : isCurrentMonth
+                    ? "bg-surface"
+                    : "bg-paper text-ink-muted"
               }`}
             >
               <span
-                className={`mb-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold sm:h-8 sm:w-8 sm:text-base ${
-                  isToday ? "bg-brand text-white" : isCurrentMonth ? "text-ink" : "text-ink-muted"
+                className={`mb-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold sm:h-8 sm:w-8 sm:text-base ${
+                  isToday
+                    ? "bg-ink text-white"
+                    : hasAppointments
+                      ? "text-ink"
+                      : isCurrentMonth
+                        ? "text-ink"
+                        : "text-ink-muted"
                 }`}
               >
                 {day.getDate()}
               </span>
               {visible.map((appt) => (
-                <span key={appt.id} className="truncate text-[11px] font-semibold leading-tight text-brand sm:text-xs">
+                <span key={appt.id} className="truncate text-[11px] font-semibold leading-tight text-ink sm:text-xs">
                   {formatTime12h(appt.start_time)} {appt.customers?.name ?? "Walk-in"}
                 </span>
               ))}
               {extra > 0 && (
-                <span className="truncate text-[11px] font-medium leading-tight text-brand sm:text-xs">
+                <span className="truncate text-[11px] font-bold leading-tight text-ink sm:text-xs">
                   +{extra} more
                 </span>
               )}

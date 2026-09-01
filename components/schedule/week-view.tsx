@@ -54,17 +54,24 @@ export function WeekView({
         {days.map((day) => {
           const iso = toIso(day)
           const isToday = iso === today
+          const hasAppointments = activeAppointments.some((a) => a.appointment_date === iso)
           return (
             <button
               key={iso}
               type="button"
               onClick={() => onOpenDay(iso)}
-              className="border-b border-r border-line py-2.5 text-center last:border-r-0 active:bg-brand-light/40"
+              className={`border-b border-r border-line py-2.5 text-center last:border-r-0 active:opacity-90 ${
+                hasAppointments ? "rounded-lg bg-brand" : "active:bg-brand-light/40"
+              } ${isToday ? "ring-2 ring-inset ring-ink" : ""}`}
             >
-              <p className="text-xs font-medium text-ink-muted sm:text-sm">
+              <p className={`text-xs font-medium sm:text-sm ${hasAppointments ? "text-ink" : "text-ink-muted"}`}>
                 {day.toLocaleDateString("en-US", { weekday: "short" })}
               </p>
-              <p className={`text-base font-bold sm:text-lg ${isToday ? "text-brand" : "text-ink"}`}>
+              <p
+                className={`text-base font-bold sm:text-lg ${
+                  hasAppointments ? "text-ink" : isToday ? "text-brand" : "text-ink"
+                }`}
+              >
                 {day.getDate()}
               </p>
             </button>
