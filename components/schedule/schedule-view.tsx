@@ -48,7 +48,7 @@ export function ScheduleView({
   const activeTodayAppointments = todayAppointments.filter((a) => a.status !== "cancelled")
 
   function goTo(nextView: ScheduleViewMode, nextDate: string) {
-    router.push(`/schedule?view=${nextView}&date=${nextDate}`)
+    router.push(`/schedule?view=${nextView}&date=${nextDate}&today=${today}`)
   }
 
   function handlePrevious() {
