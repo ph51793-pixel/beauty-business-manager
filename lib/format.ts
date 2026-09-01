@@ -21,6 +21,10 @@ export function formatDateLong(dateStr: string): string {
   }).format(new Date(year, month - 1, day))
 }
 
+export function formatTime(time: string): string {
+  return time.slice(0, 5)
+}
+
 export function todayIsoDate(): string {
   const now = new Date()
   const offset = now.getTimezoneOffset()

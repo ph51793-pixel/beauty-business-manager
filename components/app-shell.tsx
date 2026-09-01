@@ -3,13 +3,14 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, Receipt, Settings, Plus } from "lucide-react"
+import { LayoutDashboard, Users, CalendarDays, Receipt, Settings, Plus } from "lucide-react"
 import { QuickAddSheet } from "./quick-add-sheet"
 import type { Customer } from "@/lib/data/customers"
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/customers", label: "Customers", icon: Users },
+  { href: "/schedule", label: "Schedule", icon: CalendarDays },
   { href: "/transactions", label: "Transactions", icon: Receipt },
   { href: "/settings", label: "Settings", icon: Settings },
 ]

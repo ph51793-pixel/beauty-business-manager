@@ -14,7 +14,7 @@ function revalidateAll() {
   revalidatePath("/customers")
 }
 
-async function resolveCustomerId(
+export async function resolveCustomerId(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
   customerId: string,

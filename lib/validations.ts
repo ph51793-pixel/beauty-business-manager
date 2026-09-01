@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { EXPENSE_CATEGORIES, PAYMENT_METHODS } from "./constants"
+import { APPOINTMENT_STATUSES, EXPENSE_CATEGORIES, PAYMENT_METHODS } from "./constants"
 
 export const customerSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(120),
@@ -34,3 +34,25 @@ export const expenseSchema = z.object({
 export const transactionSchema = z.discriminatedUnion("type", [incomeSchema, expenseSchema])
 
 export type TransactionInput = z.infer<typeof transactionSchema>
+
+const timePattern = /^([01]\d|2[0-3]):([0-5]\d)$/
+
+export const appointmentSchema = z.object({
+  client_id: z.string().uuid().optional().or(z.literal("")),
+  new_customer_name: z.string().trim().max(120).optional().or(z.literal("")),
+  service: z.string().trim().min(1, "Service is required").max(200),
+  appointment_date: z.string().min(1, "Date is required"),
+  start_time: z.string().regex(timePattern, "Invalid start time"),
+  end_time: z.string().regex(timePattern, "Invalid end time"),
+  price: z
+    .string()
+    .optional()
+    .transform((v) => (v && v.trim() !== "" ? Number(v) : undefined))
+    .refine((v) => v === undefined || (Number.isFinite(v) && v > 0), {
+      message: "Price must be greater than $0",
+    }),
+  notes: z.string().trim().max(2000).optional().or(z.literal("")),
+  status: z.enum(APPOINTMENT_STATUSES).optional(),
+})
+
+export type AppointmentInput = z.infer<typeof appointmentSchema>
