@@ -25,6 +25,14 @@ export function formatTime(time: string): string {
   return time.slice(0, 5)
 }
 
+export function formatTime12h(time: string): string {
+  const [hStr, mStr] = time.split(":")
+  const hour = Number(hStr)
+  const period = hour >= 12 ? "PM" : "AM"
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12
+  return `${hour12}:${mStr} ${period}`
+}
+
 export function todayIsoDate(): string {
   const now = new Date()
   const offset = now.getTimezoneOffset()

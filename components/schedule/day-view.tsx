@@ -1,9 +1,9 @@
 import { BUSINESS_HOURS_END, BUSINESS_HOURS_START, APPOINTMENT_STATUS_STYLES } from "@/lib/constants"
-import { formatCurrency, formatTime } from "@/lib/format"
+import { formatCurrency, formatTime12h } from "@/lib/format"
 import type { AppointmentWithClient } from "@/lib/data/appointments"
 
 const SLOT_MINUTES = 30
-const SLOT_HEIGHT = 56
+const SLOT_HEIGHT = 68
 
 function timeToMinutes(time: string): number {
   const [h, m] = time.split(":").map(Number)
@@ -45,7 +45,7 @@ export function DayView({
   return (
     <div className="overflow-hidden rounded-2xl bg-surface shadow-card">
       <div className="flex">
-        <div className="w-14 shrink-0">
+        <div className="w-16 shrink-0">
           {Array.from({ length: slotCount }, (_, i) => {
             const minutes = businessStart + i * SLOT_MINUTES
             const isHour = minutes % 60 === 0
@@ -53,9 +53,9 @@ export function DayView({
               <div
                 key={i}
                 style={{ height: SLOT_HEIGHT }}
-                className="border-t border-line/70 pr-2 pt-0.5 text-right text-[10px] text-ink-muted"
+                className="border-t border-line/70 pr-2 pt-0.5 text-right text-xs font-semibold text-ink-muted sm:text-sm"
               >
-                {isHour ? minutesToTime(minutes) : ""}
+                {isHour ? formatTime12h(minutesToTime(minutes)) : ""}
               </div>
             )
           })}
@@ -84,7 +84,7 @@ export function DayView({
             const endMinutes = Math.min(businessEnd, timeToMinutes(appt.end_time))
             const top = ((startMinutes - businessStart) / SLOT_MINUTES) * SLOT_HEIGHT
             const height = Math.max(
-              28,
+              52,
               ((endMinutes - startMinutes) / SLOT_MINUTES) * SLOT_HEIGHT - 2
             )
             const styles =
@@ -96,12 +96,17 @@ export function DayView({
                 key={appt.id}
                 type="button"
                 onClick={() => onAppointmentClick(appt)}
-                className={`absolute inset-x-1 overflow-hidden rounded-lg px-2 py-1 text-left shadow-card ${styles.card}`}
+                className={`absolute inset-x-1 overflow-hidden rounded-lg px-3 py-1.5 text-left shadow-card ${styles.card}`}
                 style={{ top, height }}
               >
-                <p className="truncate text-xs font-semibold">{appt.customers?.name ?? "Walk-in"}</p>
-                <p className="truncate text-[10px] opacity-80">
-                  {appt.service} · {formatTime(appt.start_time)}–{formatTime(appt.end_time)}
+                <p className="truncate text-sm font-bold leading-tight text-brand sm:text-base">
+                  {formatTime12h(appt.start_time)}
+                </p>
+                <p className="truncate text-base font-bold leading-tight text-brand sm:text-lg">
+                  {appt.customers?.name ?? "Walk-in"}
+                </p>
+                <p className="truncate text-xs leading-tight text-ink-muted">
+                  {appt.service}
                   {appt.price ? ` · ${formatCurrency(Number(appt.price))}` : ""}
                 </p>
               </button>

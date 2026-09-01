@@ -1,6 +1,6 @@
 import { startOfWeek, addDays, formatISO } from "date-fns"
 import { BUSINESS_HOURS_END, BUSINESS_HOURS_START, APPOINTMENT_STATUS_STYLES } from "@/lib/constants"
-import { formatTime, todayIsoDate } from "@/lib/format"
+import { formatTime12h, todayIsoDate } from "@/lib/format"
 import type { AppointmentWithClient } from "@/lib/data/appointments"
 
 function parseIsoDate(dateStr: string): Date {
@@ -13,7 +13,7 @@ function toIso(date: Date): string {
 }
 
 function hourLabel(hour: number): string {
-  return `${String(hour).padStart(2, "0")}:00`
+  return `${hour % 12 === 0 ? 12 : hour % 12}${hour >= 12 ? "PM" : "AM"}`
 }
 
 export function WeekView({
@@ -49,7 +49,7 @@ export function WeekView({
 
   return (
     <div className="overflow-x-auto rounded-2xl bg-surface shadow-card">
-      <div className="grid min-w-[640px] grid-cols-[56px_repeat(7,1fr)]">
+      <div className="grid min-w-[820px] grid-cols-[68px_repeat(7,1fr)]">
         <div className="border-b border-r border-line" />
         {days.map((day) => {
           const iso = toIso(day)
@@ -59,12 +59,12 @@ export function WeekView({
               key={iso}
               type="button"
               onClick={() => onOpenDay(iso)}
-              className="border-b border-r border-line py-2 text-center last:border-r-0 active:bg-brand-light/40"
+              className="border-b border-r border-line py-2.5 text-center last:border-r-0 active:bg-brand-light/40"
             >
-              <p className="text-xs font-medium text-ink-muted">
+              <p className="text-xs font-medium text-ink-muted sm:text-sm">
                 {day.toLocaleDateString("en-US", { weekday: "short" })}
               </p>
-              <p className={`text-sm font-semibold ${isToday ? "text-brand" : "text-ink"}`}>
+              <p className={`text-base font-bold sm:text-lg ${isToday ? "text-brand" : "text-ink"}`}>
                 {day.getDate()}
               </p>
             </button>
@@ -73,7 +73,7 @@ export function WeekView({
 
         {hours.map((hour) => (
           <div key={hour} className="contents">
-            <div className="border-r border-t border-line px-1 py-2 text-right text-[10px] text-ink-muted">
+            <div className="border-r border-t border-line px-1.5 py-2 text-right text-xs font-medium text-ink-muted sm:text-sm">
               {hourLabel(hour)}
             </div>
             {days.map((day) => {
@@ -82,7 +82,7 @@ export function WeekView({
               return (
                 <div
                   key={iso + hour}
-                  className="min-h-[44px] border-r border-t border-line p-0.5 last:border-r-0"
+                  className="min-h-[60px] border-r border-t border-line p-0.5 last:border-r-0"
                 >
                   {cellAppointments.length === 0 ? (
                     <button
@@ -92,15 +92,20 @@ export function WeekView({
                       aria-label={`Add appointment at ${hourLabel(hour)}`}
                     />
                   ) : (
-                    <div className="flex flex-col gap-0.5">
+                    <div className="flex flex-col gap-1">
                       {cellAppointments.slice(0, 2).map((appt) => (
                         <button
                           key={appt.id}
                           type="button"
                           onClick={() => onAppointmentClick(appt)}
-                          className={`truncate rounded px-1 py-0.5 text-left text-[10px] font-medium ${APPOINTMENT_STATUS_STYLES[appt.status as keyof typeof APPOINTMENT_STATUS_STYLES]?.card ?? "bg-brand-light text-ink"}`}
+                          className={`overflow-hidden rounded-lg px-1.5 py-1 text-left leading-tight ${APPOINTMENT_STATUS_STYLES[appt.status as keyof typeof APPOINTMENT_STATUS_STYLES]?.card ?? "bg-brand-light text-ink"}`}
                         >
-                          {formatTime(appt.start_time)} {appt.customers?.name ?? "Walk-in"}
+                          <span className="block truncate text-xs font-bold text-brand">
+                            {formatTime12h(appt.start_time)}
+                          </span>
+                          <span className="block truncate text-xs font-bold text-brand">
+                            {appt.customers?.name ?? "Walk-in"}
+                          </span>
                         </button>
                       ))}
                     </div>

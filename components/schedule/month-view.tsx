@@ -1,5 +1,5 @@
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, formatISO } from "date-fns"
-import { formatTime, todayIsoDate } from "@/lib/format"
+import { formatTime12h, todayIsoDate } from "@/lib/format"
 import type { AppointmentWithClient } from "@/lib/data/appointments"
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
@@ -40,7 +40,7 @@ export function MonthView({
     <div className="overflow-hidden rounded-2xl bg-surface shadow-card">
       <div className="grid grid-cols-7 border-b border-line">
         {WEEKDAY_LABELS.map((label) => (
-          <div key={label} className="px-1 py-2 text-center text-xs font-semibold text-ink-muted">
+          <div key={label} className="px-1 py-2.5 text-center text-xs font-semibold text-ink-muted sm:text-sm">
             {label}
           </div>
         ))}
@@ -59,24 +59,24 @@ export function MonthView({
               key={iso}
               type="button"
               onClick={() => onOpenDay(iso)}
-              className={`flex min-h-[84px] flex-col items-stretch gap-0.5 border-b border-r border-line p-1.5 text-left last:border-r-0 active:bg-brand-light/40 ${
+              className={`flex min-h-[104px] flex-col items-stretch gap-1 border-b border-r border-line p-2 text-left last:border-r-0 active:bg-brand-light/40 sm:min-h-[120px] ${
                 isCurrentMonth ? "bg-surface" : "bg-paper text-ink-muted"
               }`}
             >
               <span
-                className={`mb-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold ${
+                className={`mb-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold sm:h-8 sm:w-8 sm:text-base ${
                   isToday ? "bg-brand text-white" : isCurrentMonth ? "text-ink" : "text-ink-muted"
                 }`}
               >
                 {day.getDate()}
               </span>
               {visible.map((appt) => (
-                <span key={appt.id} className="truncate text-[10px] leading-tight text-ink-muted">
-                  {formatTime(appt.start_time)} {appt.customers?.name ?? "Walk-in"}
+                <span key={appt.id} className="truncate text-[11px] font-semibold leading-tight text-brand sm:text-xs">
+                  {formatTime12h(appt.start_time)} {appt.customers?.name ?? "Walk-in"}
                 </span>
               ))}
               {extra > 0 && (
-                <span className="truncate text-[10px] font-medium leading-tight text-brand">
+                <span className="truncate text-[11px] font-medium leading-tight text-brand sm:text-xs">
                   +{extra} more
                 </span>
               )}
