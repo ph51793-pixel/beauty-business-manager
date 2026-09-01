@@ -105,12 +105,12 @@ export function WeekView({
                           key={appt.id}
                           type="button"
                           onClick={() => onAppointmentClick(appt)}
-                          className={`overflow-hidden rounded-lg px-1.5 py-1 text-left leading-tight ${APPOINTMENT_STATUS_STYLES[appt.status as keyof typeof APPOINTMENT_STATUS_STYLES]?.card ?? "bg-brand-light text-ink"}`}
+                          className={`overflow-hidden rounded-lg px-2 py-1.5 text-left leading-tight shadow-card ${APPOINTMENT_STATUS_STYLES[appt.status as keyof typeof APPOINTMENT_STATUS_STYLES]?.card ?? "bg-brand text-ink"}`}
                         >
-                          <span className="block truncate text-xs font-bold text-brand">
+                          <span className="block truncate text-xs font-bold">
                             {formatTime12h(appt.start_time)}
                           </span>
-                          <span className="block truncate text-xs font-bold text-brand">
+                          <span className="block truncate text-sm font-bold">
                             {appt.customers?.name ?? "Walk-in"}
                           </span>
                         </button>

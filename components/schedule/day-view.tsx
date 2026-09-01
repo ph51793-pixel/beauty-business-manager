@@ -99,13 +99,13 @@ export function DayView({
                 className={`absolute inset-x-1 overflow-hidden rounded-lg px-3 py-1.5 text-left shadow-card ${styles.card}`}
                 style={{ top, height }}
               >
-                <p className="truncate text-sm font-bold leading-tight text-brand sm:text-base">
+                <p className="truncate text-sm font-bold leading-tight sm:text-base">
                   {formatTime12h(appt.start_time)}
                 </p>
-                <p className="truncate text-base font-bold leading-tight text-brand sm:text-lg">
+                <p className="truncate text-base font-bold leading-tight sm:text-lg">
                   {appt.customers?.name ?? "Walk-in"}
                 </p>
-                <p className="truncate text-xs leading-tight text-ink-muted">
+                <p className="truncate text-xs leading-tight opacity-80">
                   {appt.service}
                   {appt.price ? ` · ${formatCurrency(Number(appt.price))}` : ""}
                 </p>

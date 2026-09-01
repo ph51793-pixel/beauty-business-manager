@@ -64,8 +64,8 @@ export const APPOINTMENT_STATUS_STYLES: Record<
 > = {
   scheduled: {
     badge: "bg-line text-ink",
-    card: "bg-surface border border-line text-ink",
-    dot: "bg-ink-muted",
+    card: "bg-brand text-ink",
+    dot: "bg-brand",
   },
   completed: {
     badge: "bg-success-light text-success",
