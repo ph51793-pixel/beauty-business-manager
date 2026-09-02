@@ -1,17 +1,9 @@
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, formatISO } from "date-fns"
+import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval } from "date-fns"
 import { formatTime12h, todayIsoDate } from "@/lib/format"
+import { parseIsoDate, toIso } from "@/lib/schedule/time"
 import type { AppointmentWithClient } from "@/lib/data/appointments"
 
 const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-
-function parseIsoDate(dateStr: string): Date {
-  const [year, month, day] = dateStr.split("-").map(Number)
-  return new Date(year, month - 1, day)
-}
-
-function toIso(date: Date): string {
-  return formatISO(date, { representation: "date" })
-}
 
 export function MonthView({
   anchorDate,

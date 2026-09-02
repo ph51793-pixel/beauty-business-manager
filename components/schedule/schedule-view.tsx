@@ -1,30 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { addDays, addMonths, addWeeks, formatISO } from "date-fns"
+import { addDays, addMonths, addWeeks, startOfWeek, endOfWeek } from "date-fns"
 import { Plus, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react"
 import { MonthView } from "./month-view"
 import { WeekView } from "./week-view"
 import { DayView } from "./day-view"
 import { AppointmentModal } from "./appointment-modal"
 import { AppointmentDetails } from "./appointment-details"
+import { Swipeable } from "./swipeable"
 import { formatDateLong, formatTime, todayIsoDate } from "@/lib/format"
+import { parseIsoDate, toIso } from "@/lib/schedule/time"
 import type { AppointmentWithClient } from "@/lib/data/appointments"
 import type { Customer } from "@/lib/data/customers"
 
 export type ScheduleViewMode = "month" | "week" | "day"
 
 type CreateDraft = { date: string; startTime?: string; endTime?: string }
-
-function parseIsoDate(dateStr: string): Date {
-  const [year, month, day] = dateStr.split("-").map(Number)
-  return new Date(year, month - 1, day)
-}
-
-function toIso(date: Date): string {
-  return formatISO(date, { representation: "date" })
-}
 
 export function ScheduleView({
   view,
@@ -46,6 +39,18 @@ export function ScheduleView({
 
   const today = todayIsoDate()
   const activeTodayAppointments = todayAppointments.filter((a) => a.status !== "cancelled")
+
+  // Tracks whether navigation moved forward or backward in time so the
+  // incoming view can gently slide in from the matching side — a purely
+  // cosmetic cue, no data or routing logic depends on it.
+  const prevAnchorRef = useRef(anchorDate)
+  const [enterDir, setEnterDir] = useState<"left" | "right" | null>(null)
+  useEffect(() => {
+    if (prevAnchorRef.current !== anchorDate) {
+      setEnterDir(parseIsoDate(anchorDate) > parseIsoDate(prevAnchorRef.current) ? "right" : "left")
+      prevAnchorRef.current = anchorDate
+    }
+  }, [anchorDate])
 
   function goTo(nextView: ScheduleViewMode, nextDate: string) {
     router.push(`/schedule?view=${nextView}&date=${nextDate}&today=${today}`)
@@ -80,12 +85,37 @@ export function ScheduleView({
     setCreating({ date, startTime, endTime })
   }
 
+  const anchor = parseIsoDate(anchorDate)
   const headerLabel =
     view === "day"
       ? formatDateLong(anchorDate)
       : view === "week"
-        ? "This Week"
-        : parseIsoDate(anchorDate).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+        ? formatWeekRange(anchor)
+        : anchor.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+
+  const viewContent =
+    view === "month" ? (
+      <MonthView anchorDate={anchorDate} appointments={appointments} onOpenDay={handleOpenDay} />
+    ) : view === "week" ? (
+      <Swipeable onPrevious={handlePrevious} onNext={handleNext}>
+        <WeekView
+          anchorDate={anchorDate}
+          appointments={appointments}
+          onOpenDay={handleOpenDay}
+          onSlotClick={handleSlotClick}
+          onAppointmentClick={setViewingDetails}
+        />
+      </Swipeable>
+    ) : (
+      <Swipeable onPrevious={handlePrevious} onNext={handleNext}>
+        <DayView
+          date={anchorDate}
+          appointments={appointments}
+          onSlotClick={handleSlotClick}
+          onAppointmentClick={setViewingDetails}
+        />
+      </Swipeable>
+    )
 
   return (
     <div className="flex flex-col gap-4">
@@ -183,24 +213,17 @@ export function ScheduleView({
         </div>
       )}
 
-      {view === "month" ? (
-        <MonthView anchorDate={anchorDate} appointments={appointments} onOpenDay={handleOpenDay} />
-      ) : view === "week" ? (
-        <WeekView
-          anchorDate={anchorDate}
-          appointments={appointments}
-          onOpenDay={handleOpenDay}
-          onSlotClick={handleSlotClick}
-          onAppointmentClick={setViewingDetails}
-        />
-      ) : (
-        <DayView
-          date={anchorDate}
-          appointments={appointments}
-          onSlotClick={handleSlotClick}
-          onAppointmentClick={setViewingDetails}
-        />
-      )}
+      <div
+        key={`${view}-${anchorDate}`}
+        className="schedule-slide-in"
+        style={
+          {
+            "--schedule-slide-from": enterDir === "left" ? "-14px" : enterDir === "right" ? "14px" : "0px",
+          } as React.CSSProperties
+        }
+      >
+        {viewContent}
+      </div>
 
       {creating && (
         <AppointmentModal
@@ -232,4 +255,12 @@ export function ScheduleView({
       )}
     </div>
   )
+}
+
+function formatWeekRange(anchor: Date): string {
+  const start = startOfWeek(anchor, { weekStartsOn: 0 })
+  const end = endOfWeek(anchor, { weekStartsOn: 0 })
+  const startLabel = start.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+  const endLabel = end.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  return `${startLabel} – ${endLabel}`
 }
